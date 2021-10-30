@@ -1,0 +1,171 @@
+
+
+\input{../includes/preamble}
+
+\newcommand{\subtitle}{\textbf{Exercise 1}}
+\newcommand{\outdate}{25.10.2021}
+\newcommand{\duedate}{01.11.2021 16:00 CET}
+\newcommand{\video}{004}
+
+\begin{document}
+
+\input{../includes/header.tex}
+
+\question[1]{Slotted Page}
+
+As discussed in the lecture, a page (aka. block) has a certain capacity in bytes, say 512, and is the smallest transfer unit of block storage devices (like a HDD). 
+We look at each page as being simply a sequence of bytes, like it would be stored on disk. 
+A slotted page is a page that stores a number of tuples of a relation. 
+At the beginning of each slotted page, there are header information that tell where the tuples are located within the page. The page id together with the slot id is called TID, i.e., tuple identifier. 
+To keep the implementation simple, in this exercise we assume that there are five slots. 
+Each slot is a pointer that is pointing to the beginning of the tuple information. 
+For the sake of this exercise, we only look at tuples of a specific type, namely, tuples from the TPC-H relation {\tt Orders}.
+
+Download from OLAT the {\tt SlottedPageExercise.java} and the {\tt orders\_small.tbl} file.
+The Code already contains a simple class called FakeBlockStorage, which has methods to operate with pages in byte array form, simply storing and retrieving them, and if needed allocating new pages. 
+As you can see, we have already implemented ways to create a byte array from an Order and vice versa. Your task is to implement the storing of a tuple, the retrieval of a tuple, and the calculation of unused bytes. In the Java code, we have marked with {\tt //TODO} where you need to provide code.
+There is also a {\tt main} method that reads $|$-separated lines from the given data file and stores them in the storage---some simple checks try to help you debugging the code.
+Additionally, we provide some utility methods to help you writing to the page's byte array, have a closer look, they should be very handy.
+As you can see there, each pointer consumes one {\tt int}. The way to store the Orders tuples (in byte[] form of course) inside the page is up to you. 
+
+\textbf{Submit the solution code file as .java and add the output of the execution to your solution PDF.}
+
+In the following illustration you see a depiction of a slotted page. There are the aforementioned five pointers to tuple offsets. 
+
+\begin{tikzpicture}
+\draw[black, thick] (0,0) -- (5,0) -- (5,5) -- (0,5) -- (0,0);
+\node[black,draw=black,anchor=west] at (0,4.73) (p1) {p1};
+\node[black,draw=black,anchor=west,right=0cm of p1] (p2) {p2};
+\node[black,draw=black,anchor=west,right=0cm of p2] (p3) {p3};
+\node[black,draw=black,anchor=west,right=0cm of p3] (p4) {p4};
+\node[black,draw=black,anchor=west,right=0cm of p4] (p5) {p5};
+\end{tikzpicture}
+
+\newpage
+
+\question[1]{Page Reference String (PRS) Analysis}
+
+\begin{enumerate}
+  \item Given the following PRS:
+
+        \begin{center}
+          $\langle$ (T1,A) (T1,B) (T1,E) (T2,F) (T1,C) (T1,D) (T2,D) (T2,E) (T2,C) (T1,G) (T1,D) (T1,A) (T1,F) (T1,F) (T1,C) (T2,A) (T2,B) $\rangle$
+        \end{center}
+        Calculate the sequentiality and locality.
+        Use the working-set-method for locality and calculate the average over both transactions.
+        Assume a window size of $\tau = 3$.
+
+  \item Given the following stack depth distribution:
+
+        \begin{center}
+          \begin{minipage}{0.31\columnwidth}
+            \begin{tabular}{|p{2cm}|p{2cm}|} \hline
+              {\bf Stack depth} & {\bf Frequency} \\ \hline \hline
+              1                 & 562             \\ \hline
+              2                 & 445             \\ \hline
+              3                 & 408             \\ \hline
+              4                 & 373             \\ \hline
+              5                 & 144             \\ \hline
+            \end{tabular}
+          \end{minipage}
+          \begin{minipage}{0.31\columnwidth}
+            \begin{tabular}{|p{2cm}|p{2cm}|} \hline
+              {\bf Stack depth} & {\bf Frequency} \\ \hline \hline
+              6                 & 115             \\ \hline
+              7                 & 102             \\ \hline
+              8                 & 78              \\ \hline
+              9                 & 31              \\ \hline
+              10                & 20              \\ \hline
+            \end{tabular}
+          \end{minipage}
+        \end{center}
+
+        Answer the following questions:
+        \begin{enumerate}
+          \item[i)] How small can the buffer be, if we want no more than 8\% of cache-misses?
+
+          \item[ii)] How many cache hits (in \%) will there be, given a buffer size of 4?
+
+          \item[iii)] How many cache misses are avoided, if the buffer size is increased from 4 to 6?
+
+        \end{enumerate}
+
+\end{enumerate}
+
+\question[1]{Replacement Strategies}
+
+Given the following sequence of page accesses:
+
+\begin{center}
+  {\bf D, B, A, C, B, B, C, A, D, D, C, B, C, A, C, B, A}
+\end{center}
+\begin{enumerate}
+  \item Given a buffer size of 3, calculate the amount of cache misses for the strategies CLOCK, LRU-$k$ with $k=2$ and GCLOCK.\\
+        For GLOCK, assume an initial value $E_i=2$ for every page and increment of $W_i = 1$ on reference.
+
+  \item Which replacements would happen for the given sequence if an optimal replacement strategy, which knows all future page accesses beforehand\footnote{Such a strategy (clairvoyant) can, of course, not be implemented, but it can be compared to other replacement strategies to benchmark their performance.}, was used?
+
+  \item Given a buffer size of 2:
+        Find one example of a PRS for which FIFO has less cache {\bf misses} than LRU, 
+        and one for which FIFO has less {\bf hits} than LRU. 
+
+\end{enumerate}
+
+\newpage
+
+\question[1]{Performance in PostgreSQL and pgAdmin}
+
+In this and the following exercise sheets we will use the relational database system {\it PostgreSQL}.
+PostgreSQL is available free of charge under an open source license,
+for example at \url{http://www.postgresql.org/} as installable packages or
+for Linux distributions via the common package managers ({\tt apt-get, yum, pacman,...}).
+Install PostgreSQL (version 10 or higher) in a way appropriate to your system.
+
+  {\it pgAdmin} is a graphical user interface for PostgreSQL, which simplifies its use and administration.
+Also install this program (\url{http://www.pgadmin.org/} or package manager).
+
+Load the two data records linked in the \texttt{sql\_dumps.txt} file in OLAT.
+Take the opportunity to refresh your SQL knowledge and make a few queries against the database.
+First, run {\tt VACUUM ANALYZE}. This request has no result, however, it immediately creates statistics about the imported tables.
+
+\subsection*{Indices and their effects}
+You can retrieve the query plan, which is created by the database by using ``Explain'' (German ``Analysieren'') in the query tool.
+The actual query results are not needed for this exercise.
+Use the TPC-H dataset for the following queries.
+
+\begin{enumerate}
+  \item Which query plan is generated for the following query?
+        Please describe the plan as detailed as possible.
+        HINT: If you hover your mouse over an element in the query plan, a tool tip, with additional information, will be shown.
+
+        \begin{verbatim}
+SELECT * FROM lineitem WHERE l_suppkey < 10
+\end{verbatim}
+
+  \item How will the plan change, if you create the following index?
+
+        \begin{verbatim}
+CREATE INDEX index1 ON lineitem(l_suppkey);
+\end{verbatim}
+
+  \item By prefixing your query with \verb+EXPLAIN (ANALYZE, BUFFERS)+, PostgreSQL will explain give additional information on DB buffer usage.
+        How does the buffer usage change if you run the following query three times?
+        Give the output row of \verb+Buffers ...+ each time.
+
+        \begin{verbatim}
+EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM orders WHERE o_totalprice < 100
+\end{verbatim}
+
+  \item PostgreSQL ships with an extension which allows ``prewarming'' a table, which means filling the buffer with relevant pages.
+        Execute the following queries and again give the \verb+Buffers ...+ row.
+        Explain what the output means and why there may still pages be read from the disk.
+
+        \begin{verbatim}
+CREATE EXTENSION pg_prewarm;
+SELECT pg_prewarm('orders');
+EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM orders WHERE o_totalprice < 100
+\end{verbatim}
+
+\end{enumerate}
+
+\end{document}

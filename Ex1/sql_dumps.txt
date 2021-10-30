@@ -1,0 +1,11 @@
+# SQL Dumps
+For some questions a PostgreSQL installation with sample SQL data will be required.
+Please download and import the following SQL dumps into a local database:
+
+https://dbis.informatik.uni-kl.de/files/teaching/ws1819/dbs/protected/uni_db.dmp
+
+https://dbis.informatik.uni-kl.de/files/teaching/ws1819/dbs/protected/tpch.dmp.gz
+
+The links are either available from within the university network (also VPN) or with the following credentials:
+User: dbs2021
+Password: integer
