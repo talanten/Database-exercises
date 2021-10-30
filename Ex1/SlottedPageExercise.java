@@ -104,17 +104,17 @@ public class SlottedPageExercise {
 		writeToPage(page, offset, tupleBytes); // Write tuple to page
 	}
 
-	/**
-	 * Modifies the given page byte[] by writing a pointer value to the byte[] starting at offset
-	 * @param page The content of the page (byte[])
-	 * @param numPointer The value of the pointer to be written
-	 * @param offset The position of the pointer within the page byte[]
-	 * @throws Exception
-	 */
-	private void writePointer(byte[] page, int numPointer, int offset) throws Exception {
-		byte[] pointerBytes = ByteBuffer.allocate(INT_SIZE).putInt(offset).array();
-		writeToPage(page, numPointer * INT_SIZE, pointerBytes); // Write pointer to page
-	}
+/**
+     * Modifies the given page byte[] by writing a pointer value to the page at a given index
+     * @param page The content of the page (byte[])
+     * @param pointerIndex The index of the pointer (starting at 0)
+     * @param pointer The pointer to be stored (an offset within the page byte[])
+     * @throws Exception
+     */
+    private void writePointer(byte[] page, int pointerIndex, int pointer) throws Exception {
+        byte[] pointerBytes = ByteBuffer.allocate(INT_SIZE).putInt(pointer).array();
+        writeToPage(page, pointerIndex * INT_SIZE, pointerBytes); // Write pointer to page
+    }
 
 	
 	/**
@@ -135,8 +135,25 @@ public class SlottedPageExercise {
 		
 		///////////////////////////////////////////////
 		//TODO - Solution code here
-	
-		
+		// 1. Sequentially check all pages for available free slot and stop on 1st available page
+		Set<Integer> allPgIds = storage.getAllPageIds();
+
+		int pgId2Use = -1;
+
+		for (int i : allPgIds) {
+			if (order.length <= unusedBytes(i)) {
+				pgId2Use = i;
+				break;
+			} else continue;
+		}
+
+		// 2. If no page available with free slot, then create new page
+		if (pgId2Use < 0) {
+			pgId2Use = storage.initNewPage();
+		}
+
+		// 3. Save order obj in given page
+		??
 		///////////////////////////////////////////////////
 		//END OF TODO
 		
@@ -156,8 +173,31 @@ public class SlottedPageExercise {
 		//the object we want to return in the end, just initialized with NULL to make the file compile
 		Order ret = null;
 		//TODO - Solution code here
-		
-		
+		ByteArrayInputStream s = new ByteArrayInputStream(p);
+		DataInputStream ds = new DataInputStream(s);
+
+		int slotNo = -1;
+		int i = 0;
+		// Find slot number of the tuple
+		for (i = 0; i <= tid.getSlot(); i++) {
+			slotNo = ds.readInt();
+		}
+
+		// Skip header 
+		while (i < NUM_POINTERS) {
+			ds.readInt();
+		}
+
+		// Skip bytes before needed tuple
+		ds.readNBytes(slotNo-HEADER_SIZE);
+
+		// Read the size of the tuple from 1st 4 bytes
+		int tupleSize = ds.readInt();
+
+		// Get tuple in bytes and convert to Order object
+		byte[] tuple = ds.readNBytes(tupleSize);
+		ret = new Order(tuple);
+
 		//END TODO
 		return ret;
 	}
@@ -173,8 +213,7 @@ public class SlottedPageExercise {
 		int usedBytes = HEADER_SIZE; // Header is always reserved
 		
 		//TODO - Solution code here
-		
-		
+		usedBytes += page.length;
 		
 		//END OF TODO
 		
