@@ -305,7 +305,9 @@ public class SlottedPageExercise {
 		int lastTupleLen = 0;
 
 		if (prevPointer != 0) {
-			ds.readNBytes(HEADER_SIZE - pointerIndex * INT_SIZE - INT_SIZE); // One more INT_SIZE, because it already had read one more pointer
+			// Skip header. If pointerIndex is already 5, then header is already has been read fully. No need for more skipping.
+			if (pointerIndex != NUM_POINTERS)
+				ds.readNBytes(HEADER_SIZE - pointerIndex * INT_SIZE - INT_SIZE); // One more INT_SIZE, because it already had read one more pointer
 			if ((prevPointer - HEADER_SIZE) > 0)
 				readNBytes(ds, prevPointer - HEADER_SIZE);
 			lastTupleLen = ds.readInt() + INT_SIZE;	// the 1st 4 bytes of slot is always size of tuple
@@ -348,10 +350,17 @@ public class SlottedPageExercise {
 		
 		//the object we want to return in the end (just initialized with 0 here to make the entire file compile)
 		double ret=0; 
-		
+
 		//TODO - Solution code here
+		int totalUsedSpace = 0;
+		int allocatedSpace = 0;
+
+		for (int pgId : idSet) {
+			totalUsedSpace += getUsedSpaceInPg(pgId);
+			allocatedSpace += storage.getPageSize();
+		}
 		
-		
+		ret = (double) totalUsedSpace / allocatedSpace;
 		//end TODO 
 
 		return ret;
