@@ -200,7 +200,7 @@ public class SlottedPageExercise {
 		int pgId2Use = -1;
 
 		for (int i : allPgIds) {
-			if ((order.length + INT_SIZE) <= unusedBytes(i) && isSlotAvailableInPg(i)) {
+			if (isSlotAvailableInPg(i) && (order.length + INT_SIZE) <= unusedBytes(i)) {
 				pgId2Use = i;
 				break;
 			}
