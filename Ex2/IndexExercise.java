@@ -173,8 +173,15 @@ class Index {
 //                           |___/                            
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 class DenseIndex extends Index {
+
+    Map<String, List<Integer>> denseIndex;
+
     DenseIndex(ArrayList<Tuple> tuples) {
         super(tuples);
+        denseIndex = new HashMap<>();
+        for (Tuple tuple : tuples) {
+            denseIndex.computeIfAbsent(tuple.string, k -> new ArrayList<>()).add(tuple.hashCode());
+        }
     }
 
     @Override
@@ -183,8 +190,21 @@ class DenseIndex extends Index {
      * @return a list of tuples for which the string is equal to the query string.
      */
     public List<Tuple> getEqualStringTuples(String string) {
-        System.out.println("DenseIndex::getEqualStringTuples not implemented!");
-        return new ArrayList<>();
+        ArrayList<Tuple> ret = new ArrayList<>();
+        List<Integer> pointers = this.denseIndex.get(string);
+        for (int p : pointers) {
+            Tuple tuple = tuples.stream()
+                        .filter(t -> t.hashCode() == p)
+                        .findFirst()
+                        .orElse(null);
+
+            if (tuple == null)
+                System.out.println("!!!NULL object found for string: " + string);
+            else
+                ret.add(tuple);
+        }
+        
+        return ret;
     }
 
     @Override
@@ -193,8 +213,13 @@ class DenseIndex extends Index {
      * @return a list of tuples for which the string is equal or greater to the query string.
      */
     public List<Tuple> getGreaterEqualsStringTuples(String string) {
-        System.out.println("DenseIndex::getGreaterEqualsStringTuples not implemented!");
-        return new ArrayList<>();
+        ArrayList<Tuple> ret = new ArrayList<>();
+        for (Tuple tuple : tuples) {
+            if(tuple.string.compareTo(string) >= 0){
+                ret.add(tuple);
+            }
+        }
+        return ret;
     }
 
 }
