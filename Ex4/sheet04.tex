@@ -1,0 +1,174 @@
+
+\input{../includes/preamble}
+
+\newcommand{\subtitle}{\textbf{Exercise 4}}
+\newcommand{\outdate}{15.11.2021}
+\newcommand{\duedate}{22.11.2021 16:00 CET}
+\newcommand{\video}{024}
+
+\begin{document}
+
+\input{../includes/header.tex}
+
+\question[1]{Wavelets, Sketches}
+
+\begin{enumerate}
+\item
+  Calculate the wavelet transform of the following cumulative distribution over the numbers 0 to 7.
+  Also calculate the Mean-Squared-Error (MSE) if you omit all coefficients $\leq 3$.
+
+  $$[2, 4, 5, 5, 12, 20, 26, 30]$$
+
+\item Given the following Table with elements $x \in X$ and the hash values for the hash function $h: X \rightarrow [0,1]$.\\
+
+\begin{center}
+\begin{minipage}{0.2\columnwidth}
+\begin{tabular}{|l|r|} \hline
+$x$  & $h(x)$ \\ \hline \hline
+Toyota & 0.05 \\ \hline
+Ford & 0.47 \\ \hline
+Bughatti & 0.72 \\ \hline
+BMW & 0.26 \\ \hline
+Audi & 0.8 \\ \hline
+\end{tabular}
+\end{minipage}
+\begin{minipage}{0.3\columnwidth}
+\begin{tabular}{|l|r|} \hline
+$x$  & $h(x)$ \\ \hline \hline
+Mercedes & 0.14 \\ \hline
+Dodge & 0.565 \\ \hline
+Porsche & 0.63 \\ \hline
+Nissan & 0.395 \\ \hline
+Hyundai & 0.93 \\ \hline
+\end{tabular}
+\end{minipage}
+\end{center}
+
+Using the KMV Sketch algorithm for $ k \in {1, 2, 3, 4, 5} $, calculate the estimate as well as the absolute error. Will the error get smaller with a larger $ k $? How does your observation explain the impact of $ k $ on KMV Sketch?
+
+\end{enumerate}
+
+\newpage
+
+\question[1]{Statistics in PostgreSQL}
+To improve the query optimization, PostgreSQL keeps track of various statistics about every column in every table.
+Consider the following statistics about the {\it lineitem} table from the TPC-H database:
+
+\verb+SELECT * FROM pg_stats WHERE tablename = 'lineitem'+
+
+\begin{table}[H]
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{attname} & \textbf{null\_frac} & \textbf{n\_distinct} & \textbf{most\_common\_vals} & \textbf{most\_common\_freqs} \\ \hline
+
+l\_linenumber & 0 & 7 & \{1,2,3,4,5,6,7\} & \{0.25,0.21,0.17,0.14,0.10,0.07,0.03\} \\ \hline
+l\_orderkey & 0 & 419664 & \multicolumn{1}{|p{4cm}|}{ \{1703939,3644579,507137,\newline 703172,712326,770882,\newline 971014\} }
+                         & \multicolumn{1}{|p{4cm}|}{ \{0.000133333,0.000133333,0.0001,\newline 0.0001,0.0001,0.0001,\newline 0.0001\} } \\ \hline
+l\_extendedprice  & 0 & -0.11964 & \multicolumn{1}{|p{4cm}|}{ \{13747.3,25165.2,\newline 26677.8,32274.0,\newline 33265.3,35938.8,50370.3 \} } &
+                                   \multicolumn{1}{|p{4cm}|}{ \{0.0001,0.0001,0.0001,0.0001,\newline 0.0001,0.0001,0.0001 \} } \\ \hline
+
+\end{tabular}
+\end{table}
+\begin{enumerate}
+\item What does each column of \emph{pg\_stats} represent? 
+
+\item Which of the following queries benefit from these statistics? The total size of the table is $6\,001\,215$.
+\begin{itemize}[label={}]
+\setlength{\itemsep}{0cm}
+\item $\Box$ \verb+SELECT * FROM lineitem+ 
+
+\item $\Box$ \verb+SELECT * FROM lineitem WHERE l_orderkey IS NOT NULL+ 
+
+\item $\Box$ \verb+SELECT * FROM lineitem WHERE l_orderkey = 406631+ 
+
+\item $\Box$ \verb+SELECT * FROM lineitem WHERE l_extendedprice = 32274.0+
+
+\item $\Box$ \verb+SELECT * FROM lineitem WHERE l_extendedprice <= 9500.0+ 
+
+\end{itemize}
+\item Use the statistics to estimate the result size of each query in part (b).
+
+\end{enumerate}
+In the table below an additional column of the \emph{pg\_stats} table is shown. It shows ''A list of values that divide the column's values into groups of approximately equal population. The values in \emph{most\_common\_vals}, if present, are omitted from this histogram calculation.'' -- \url{https://www.postgresql.org/docs/10/static/view-pg-stats.html}
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{attname} & \textbf{histogram\_bounds}             \\ \hline
+l\_extendedprice & \multicolumn{1}{|p{10cm}|}{  \{906.00,1528.60,2062.06,3035.16,3639.44,4444.04,5265.52,5920.60,\newline 6751.85,7518.63,8252.80,9032.32,9777.68,10540.68,11267.46,\newline 11921.76,12652.00,13413.40,14078.28 (...) \} }
+ \\ \hline
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item Decide for which queries in (b) this additional column is useful and estimate the result set size.
+
+\end{enumerate}
+
+\newpage
+\question[1]{Join ordering}
+
+Given the following query on the TPC-H database:
+
+\begin{lstlisting}[language=sql]
+SELECT *
+FROM orders o, customer c,  nation n,
+WHERE o.o_custkey = c.c_custkey AND c.c_nationkey = n.n_nationkey
+\end{lstlisting}
+
+\begin{enumerate}
+\item
+ Draw the query graph.
+
+\item
+ Calculate the join selectivities.
+
+\item
+ Calculate the cost $C_{out}$ for all possible join trees without cross products.
+
+\end{enumerate}
+
+\question[1]{Join Ordering}
+
+\begin{enumerate}
+\item
+  {\bf Left-deep trees vs. Bushy trees}\\
+  Given the following relations: $R_1$, $R_2$, $R_3$ and $R_4$,
+  with $|R_1|=200$, $|R_2|=100$, $|R_3|=150$, $|R_4|=30$, and the following join selectivities:
+  $f_{1,2}= 0.02$, $f_{1,3}= 0.15$, $f_{1,4}= 0.08$. 
+
+  \begin{enumerate}
+    \item Draw the query graph.
+
+    \item List all left-deep trees without cross products. 
+
+    \item Calculate the $C_{out}$ cost for the join orderings created in (ii) where $R_2$ is joined last (on the top of the tree).
+
+  \end{enumerate}
+
+  \item   Is there a bushy tree (that is not a linear tree), without cross products, that has lower cost?
+
+\end{enumerate}
+
+\question[1]{Join Ordering Algorithms}
+
+Write a program which compares the different greedy join ordering algorithms, presented in the lecture.
+You may use any language you like.
+You have to write one method for each greedy algorithm plus two methods that find the best and worst possible left-deep join ordering.
+For the last two functions you have to find all possible orderings (brute force).
+Do not generate join orderings that contain cross-products for the best and worst methods.
+Use the $C_{out}$ cost as weight function where applicable and find a suitable alternative where not.
+Compare the algorithm results with these costs.
+
+You may use the Java template provided in OLAT.
+The template provides all required boilerplate code and instructions on how to use it.
+
+Use your program to generate plans for the following relations: 
+$|R_1| = 250, |R_2| = 150, |R_3| = 40, |R_4| = 220$ with the selectivities: $f_{1,3} = 0.01$, $f_{2,3} = 0.02$, $f_{3,4} = 0.1$
+
+Submit the created plans with their $C_{out}$ costs and the code that created them.
+
+HINT: The best and worst plans (without cross products) range somewhere between $(7\,000,10\,500)$.
+
+\end{document}
